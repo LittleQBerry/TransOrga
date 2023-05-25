@@ -59,18 +59,18 @@ class SRlayer_(nn.Module):
 
 model  = SRlayer_(1)
 
-file_list =os.listdir("/home3/qinyiming/organoid/Dataset/OriginalData/testing/images")
+file_list =os.listdir("/organoid/Dataset/OriginalData/testing/images")
 for files in file_list:
     name,_ = os.path.splitext(files)
-    img_name = "/home3/qinyiming/organoid/Dataset/OriginalData/testing/images/"+ files
+    img_name = "/organoid/Dataset/OriginalData/testing/images/"+ files
     print(img_name)
     #img = Image.open(img_name).convert("L")
     img = cv2.imread(img_name,0)
     #img = transforms.ToTensor()(img).unsqueeze(0)
     #out,rs= model(img)
-    #torch.save(rs,'/home3/qinyiming/organoid/our_FFT/SR_results/test/{}.pt'.format(name))
+    #torch.save(rs,'/organoid/our_FFT/SR_results/test/{}.pt'.format(name))
     edges = cv2.Canny(img,100,255,apertureSize=3)
-    cv2.imwrite('/home3/qinyiming/organoid/our_FFT/edge_result/testing/{}.png'.format(name),edges)
+    cv2.imwrite('/organoid/our_FFT/edge_result/testing/{}.png'.format(name),edges)
     #print(rs.type())
     #print(rs.shape)
 
