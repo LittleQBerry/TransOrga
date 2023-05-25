@@ -1,6 +1,6 @@
 # TransOrga
  
-## Organoid research plays an important role in drug screening and disease modeling. Obtaining accurate information about organoid morphology, number, and size is fundamental to this research. However, previous methods relied on fluorescence labeling which can harm organoids or have problems with accuracy and robustness. In this paper, we first introduce Transformer architecture into the organoid segmentation task and propose an end-to-end multi-modal method named TransOrga. To enhance the accuracy and robustness, we utilize a multi-modal feature extraction module to blend spatial and frequency domain features of organoid images. Furthermore, we propose a multi-branch aggregation decoder that learns diverse contexts from various Transformer layers to predict the segmentation mask progressively. In addition, we design a series of losses, including focal loss, dice loss, compact loss and auxiliary loss, to supervise our model to predict more accurate segmentation results with rational sizes and shapes. Our extensive experiments demonstrate that our method outperforms the baselines in organoid segmentation and provides an automatic, robust, and fluorescent-free tool for organoid research.
+### Organoid research plays an important role in drug screening and disease modeling. Obtaining accurate information about organoid morphology, number, and size is fundamental to this research. However, previous methods relied on fluorescence labeling which can harm organoids or have problems with accuracy and robustness. In this paper, we first introduce Transformer architecture into the organoid segmentation task and propose an end-to-end multi-modal method named TransOrga. To enhance the accuracy and robustness, we utilize a multi-modal feature extraction module to blend spatial and frequency domain features of organoid images. Furthermore, we propose a multi-branch aggregation decoder that learns diverse contexts from various Transformer layers to predict the segmentation mask progressively. In addition, we design a series of losses, including focal loss, dice loss, compact loss and auxiliary loss, to supervise our model to predict more accurate segmentation results with rational sizes and shapes. Our extensive experiments demonstrate that our method outperforms the baselines in organoid segmentation and provides an automatic, robust, and fluorescent-free tool for organoid research.
 
 ![Network](https://github.com/LittleQBerry/TransOrga/blob/main/image/network.png)
 
@@ -30,9 +30,9 @@ We can fisrt obtain the frequency level images from **[SRNET.py](SRNet.py)**
 
 
 # Result
-![Compare](image\compare_new.png)
+![Compare](https://github.com/LittleQBerry/TransOrga/blob/main/image/compare_new.png)
 
-![MoreResult](image\cased.png)
+![MoreResult](https://github.com/LittleQBerry/TransOrga/blob/main/image/cased.png)
 ACC organoid
 | Model | Dice ↑ | mIoU↑|  Precision↑ |Recall↑ | F1-score↑ |
 | :----: | :----: | :----: |:----: |:----: |:----: |
