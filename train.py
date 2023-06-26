@@ -49,14 +49,12 @@ def evaluate_accuracy_gpu(net, data_iter, device=None):
     return metric[0] / metric[1], accuracy_score(cla_gt,cla_preds)
 
 
-# train
-def train_epoch(net, train_iter, test_iter, loss,lossd, optimizer, start_epoch,num_epochs, scheduler,swa_start, devices=d2l.try_all_gpus(), weight_path = None, data_dir = None):
+# 
+def train_epoch(net, train_iter, test_iter, loss,lossd, optimizer, start_epoch,num_epochs, scheduler, devices=d2l.try_all_gpus(), weight_path = None, data_dir = None):
     timer, num_batches = d2l.Timer(), len(train_iter)
-    # animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1], legend=['train loss', 'train acc', 'test acc'])
-    # net = nn.DataParallel(net, device_ids=devices).to(devices[0])
+
     print(devices)
-    #net = net.to(devices[1])
-    #swa_model =swa_model.to(devices[1])
+
     loss_list = []
     cla_loss_list = []
     train_acc_list = []
@@ -82,36 +80,23 @@ def train_epoch(net, train_iter, test_iter, loss,lossd, optimizer, start_epoch,n
                 X = [x.cuda(non_blocking =True) for x in X]
             else:
                 X = X.cuda(non_blocking =True)
-                #sr = sr.cuda(non_blocking =True)
-            #print(sr.shape)
-            #print(X.shape)
-            #exit()
             gt = labels.long().cuda(non_blocking =True).squeeze()
             net.train()
             optimizer.zero_grad()
             result =net(X)
-            #pred = result[-1]
+
             input_gt = torch.nn.functional.one_hot(gt, 2).permute(0,3,1,2).type(dtype = torch.float32)
             seg_loss = loss(result[-1], input_gt)
             aux_loss_1 = loss(result[0], input_gt)
             aux_loss_2 = loss(result[1], input_gt)
             aux_loss_3 = loss(result[2], input_gt)
 
-            #loss_sum = seg_loss +0.2*aux_loss_1 + 0.3*aux_loss_2 + 0.4*aux_loss_3
             loss_dice = lossd(result[-1],gt, softmax=True)
             output = torch.argmax(result[-1], dim=1)
             output = output.reshape(output.shape[0],1,output.shape[1],output.shape[2]).type(dtype = torch.float32)
             loss_com = get_compactness_cost(output)
-            #losses
-            #print(loss_com)
-            #loss_sum = seg_loss + 0.1*cla_loss+ 0.2*aux_loss_1 + 0.3*aux_loss_2 + 0.4*aux_loss_3
-            #loss_sum = 0.5*(seg_loss)+0.5*loss_dice+0.5*loss_com
+
             loss_sum = (seg_loss +0.2*aux_loss_1 + 0.3*aux_loss_2 + 0.4*aux_loss_3)+0.5*loss_dice+0.2*loss_com
-            #
-            
-            #loss_sum = loss_sum + 0.5* loss_dice
-            #loss_sum  = loss_sum 
-            #loss_sum =seg_loss
             l = loss_sum
             loss_sum.sum().backward()
             optimizer.step()
@@ -120,15 +105,9 @@ def train_epoch(net, train_iter, test_iter, loss,lossd, optimizer, start_epoch,n
             metric.add(l, acc, labels.shape[0], labels.numel(),loss_com,loss_dice,seg_loss)
             timer.stop()
         
-        #if optimizer.state_dict()['param_groups'][0]['lr']>0.001:
-        #    print("lr_step")
         
         scheduler.step()
         
-        #if epoch >=(start_epoch+70):
-            #swa_model.update_parameters(net)
-        #    scheduler.step()
-        # animator.add(epoch + 1, (None, None, test_acc))
  
         
         
@@ -138,9 +117,6 @@ def train_epoch(net, train_iter, test_iter, loss,lossd, optimizer, start_epoch,n
             img =img.cuda(non_blocking =True)
             mask =mask.cuda(non_blocking =True)
             gt = mask.long().cuda(non_blocking =True).squeeze()
-            #sr =sr.cuda(non_blocking= True)
-            #print(sr.shape)
-            #exit()
             with torch.no_grad():
                 output = net(img)
                 result = output[-1]
@@ -149,9 +125,7 @@ def train_epoch(net, train_iter, test_iter, loss,lossd, optimizer, start_epoch,n
                 #print(result.shape)
                 result = torch.argmax(result, dim=1)
                 result = result.reshape(result.shape[0],1,result.shape[1],result.shape[2]).type(dtype = torch.float32)
-                #print(result)
-                #print(result.shape)
-                #result = torch.ge(result,0.5).type(dtype = torch.float32)
+
                 #trans RGB to L
                 gt_1 = img[0]
                 #print()
@@ -172,27 +146,19 @@ def train_epoch(net, train_iter, test_iter, loss,lossd, optimizer, start_epoch,n
             --- train seg acc {metric[1] / metric[3]:.3f}  --- test seg acc {test_metric[0] /test_metric[1]:.3f}\
             --- lr {optimizer.state_dict()['param_groups'][0]['lr']} --- cost time {timer.sum()}\
              --- com_loss {metric[4] / metric[2]:.3f} --- dice_loss {metric[5] / metric[2]:.3f} --- seg_loss {metric[6] / metric[2]:.3f}")
-        #---------save model------------
+        #---------output------------
         df = pd.DataFrame()
         loss_list.append((metric[0]+metric[4]+metric[5]+metric[6]) / metric[2])
-        #cla_loss_list.append(metric[4] / metric[2])
         train_acc_list.append(metric[1] / metric[3])
-        #test_acc_list
-        #train_cla_acc_list.append(acc_cla)
         test_acc_list.append(test_metric[0] /test_metric[1] )
-        #test_cla_acc_list.append(cla_acc1)
         epochs_list.append(epoch+1)
         time_list.append(timer.sum())
         lr_list.append(optimizer.state_dict()['param_groups'][0]['lr'])
         
         df['epoch'] = epochs_list
         df['loss'] = loss_list
-        #df['cla_loss'] = cla_loss_list
         df['train_seg_acc'] = train_acc_list
         df['test_seg_acc'] = test_acc_list
-        #df['train_cla_acc'] = train_cla_acc_list
-        #df['test_acc'] = test_acc_list
-        #df['test_cla_acc'] = test_cla_acc_list
         df["lr"] = lr_list
         df['time'] = time_list
         
@@ -203,16 +169,14 @@ def train_epoch(net, train_iter, test_iter, loss,lossd, optimizer, start_epoch,n
         df.to_csv(os.path.join(data_dir,"test.csv"),index=False)
         #----------------save model------------------- 
         if epoch % 50 == 0:
-            #torch.optim.swa_utils.update_bn(train_iter, swa_model, device=devices[1])
-            #torch.save(swa_model.state_dict(), os.path.join(weight_path,f'swa_{epoch+1}.pth'))
             torch.save(net,os.path.join(weight_path,f'net_{epoch+1}.pth'))
  
-    #  save model
+    #save final
     torch.save(net, os.path.join(weight_path,f'net_{epoch+1}.pth'))
 
 
-
-os.environ['TORCH_HOME'] ='/home3/qinyiming/.cache/'
+#torch home
+os.environ['TORCH_HOME'] ='/.cache/'
 
 CUDA_LAUNCH_BLOCKING=1
 gpus =[0]
@@ -229,12 +193,11 @@ transform_train = transforms.Compose([
 ])
 transform_test = transforms.Compose([
     transforms.Resize((INPUT_SIZE,INPUT_SIZE)),  
-    #transforms.ToTensor(),
 ])
 
 batch_size = 4
 val_batch_size = 1
-data_path = '/home3/qinyiming/organoid/Dataset/OriginalData'
+data_path = '/organoid/Dataset/OriginalData'
 train_set = Dataset(path=data_path, transform =transform_train, mode ='train')
 val_set =Dataset(path=data_path, transform=transform_test, mode='validation')
 
@@ -273,28 +236,10 @@ model = nn.DataParallel(model.to('cuda:0'), device_ids=gpus, output_device=gpus[
 start_epoch =0
 epochs_num = 400
 
-#optimizer = torch.optim.AdamW(model.parameters(),lr =0.01)
 optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
-#swa_model  = AveragedModel(model)
-#swa_model = nn.DataParallel(swa_model.to('cuda:0'),device_ids=gpus, output_device=gpus[0])
-#swa_model.load_state_dict('')
-#swa_scheduler =SWALR(optimizer,swa_lr =1e-6)
 
-#schedule = monai.optimizers.LinearLR(optimizer, end_lr=0.0001, num_iter=int(epochs_num*0.1))
 schedule =torch.optim.lr_scheduler.StepLR(optimizer, step_size = 10, gamma=0.1)
-#schedule =torch.optim.lr_scheduler.StepLR(optimizer, step_size =300, gamma =0.9)
 
-steps_per_epoch = int(len(train_loader.dataset) / train_loader.batch_size)
-swa_start = int(epochs_num*0.9)
-optimizer = SWA(optimizer, swa_start=swa_start*steps_per_epoch, swa_freq=steps_per_epoch, swa_lr=0.0001)
-
-
-
-
-#lossf = nn.CrossEntropyLoss()
 lossd =DiceLoss(2)
-#weights = torch.FloatTensor([1.0, 50.0])
-#lossf = FocalLoss()
 lossf =FocalLoss_Binary()
-#lossf = nn.BCELoss()
-train_epoch(model, train_loader, val_loader, lossf, lossd,optimizer, start_epoch,epochs_num, scheduler=schedule, swa_start=swa_start, weight_path="./log/checkpoints", data_dir="./log/log")
+train_epoch(model, train_loader, val_loader, lossf, lossd,optimizer, start_epoch,epochs_num, scheduler=schedule, weight_path="./log/checkpoints", data_dir="./log/log")
