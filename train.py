@@ -123,7 +123,7 @@ def train_epoch(net, train_iter, test_iter, loss,lossd, optimizer, start_epoch,n
         #if optimizer.state_dict()['param_groups'][0]['lr']>0.001:
         #    print("lr_step")
         
-        schedule.step()
+        scheduler.step()
         
         #if epoch >=(start_epoch+70):
             #swa_model.update_parameters(net)
