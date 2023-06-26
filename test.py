@@ -48,9 +48,6 @@ val_loader =DataLoader(val_set, batch_size =1, shuffle =False)
 
 model =torch.load("/organoid/our_FFT/log/checkpoints/net_40.pth", map_location='cpu').to('cuda:0')
 print(model)
-#swa_model = AveragedModel(model)
-#swa_model.load_state_dict(torch.load("/organoid/ours/ViT_seg/multitask0327/weights/swa_196.pth", map_location='cpu'))
-#swa_model.eval()
 dices = 0
 ious = 0
 for index, (img, mask, name) in enumerate(val_loader):
