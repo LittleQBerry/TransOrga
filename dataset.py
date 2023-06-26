@@ -17,19 +17,19 @@ class Dataset(torch.utils.data.Dataset):
         if self.mode == 'train':
             self.img_path =self.img_path +"/training/images/"
             self.mask_path = self.mask_path +"/training/segmentations/"
-            self.edge_path ='/home3/qinyiming/organoid/our_FFT/edge_result/training/'
+            self.edge_path ='/organoid/our_FFT/edge_result/training/'
             train_file = os.listdir(self.img_path)
             files=train_file
         elif self.mode == 'validation':
             self.img_path =self.img_path +"/validation/images/"
             self.mask_path = self.mask_path +"/validation/segmentations/"
-            self.edge_path = '/home3/qinyiming/organoid/our_FFT/edge_result/validation/'
+            self.edge_path = '/organoid/our_FFT/edge_result/validation/'
             valid_file = os.listdir(self.img_path)
             files =valid_file
         elif self.mode == 'test':
             self.img_path =self.img_path +"/testing/images/"
             self.mask_path = self.mask_path +"/testing/segmentations/"
-            self.edge_path = '/home3/qinyiming/organoid/our_FFT/edge_result/testing/'
+            self.edge_path = '/organoid/our_FFT/edge_result/testing/'
             test_file = os.listdir(self.img_path)
             files=test_file
         self.files = files
@@ -44,7 +44,7 @@ class Dataset(torch.utils.data.Dataset):
             mask = Image.open(self.mask_path+self.files[index].strip()).convert('L')
             edge = Image.open(self.edge_path+self.files[index].strip()).convert('L')
             seed = torch.random.seed()
-            sr =torch.load("/home3/qinyiming/organoid/our_FFT/SR_results/training/{}.pt".format(name))
+            sr =torch.load("/organoid/our_FFT/SR_results/training/{}.pt".format(name))
             sr =sr[0]
             #sr = sr.numpy()
                 #print("aa")
@@ -75,7 +75,7 @@ class Dataset(torch.utils.data.Dataset):
             mask = Image.open(self.mask_path+self.files[index].strip()).convert('L')
             edge = Image.open(self.edge_path+self.files[index].strip()).convert('L')
             seed = torch.random.seed()
-            sr =torch.load("/home3/qinyiming/organoid/our_FFT/SR_results/validation/{}.pt".format(name))
+            sr =torch.load("/organoid/our_FFT/SR_results/validation/{}.pt".format(name))
             sr =sr[0]
             #sr = sr.numpy() 
             #seed = torch.random.seed()
@@ -102,7 +102,7 @@ class Dataset(torch.utils.data.Dataset):
             mask = Image.open(self.mask_path+self.files[index].strip()).convert('L')
             edge = Image.open(self.edge_path+self.files[index].strip()).convert('L')
             seed = torch.random.seed()
-            sr =torch.load("/home3/qinyiming/organoid/our_FFT/SR_results/test/{}.pt".format(name))
+            sr =torch.load("/organoid/our_FFT/SR_results/test/{}.pt".format(name))
             sr =sr[0]
             #sr = sr.numpy() 
             #seed = torch.random.seed()
