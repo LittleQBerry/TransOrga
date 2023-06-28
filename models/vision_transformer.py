@@ -217,33 +217,7 @@ class SRlayer_(nn.Module):
         self.gaussi.weight = nn.Parameter(self.gauKernal,requires_grad=False)
         self.out=torch.zeros((2,3,512,512))
     def forward(self,x):
-        #out = []
-        #SRs = []
-        #print(self.out.type())
-        '''
-        for batch in range(x.shape[0]):
-            
-            x1 = x[batch,0,:,:].unsqueeze(0).unsqueeze(0)
-            print(x1.shape)
-            print(batch)
-            #print(x1.dtype)
-            rfft = torch.fft.fftn(x1)
-            amp = torch.abs(rfft) + torch.exp(torch.tensor(-10))
-            log_amp = torch.log(amp)
-            phase = torch.angle(rfft)
-            amp_filter = self.amp_conv(log_amp)
-            amp_sr = log_amp - amp_filter
-            SR = torch.fft.ifftn(torch.exp(amp_sr+1j*phase))
-            SR = torch.abs(SR)
-            SR = self.gaussi(SR)
-            y = torch.cat([SR,x1],dim=1)
-            y = self.output_conv(y)
-            y = self.bn(y)
-            y = self.Relu(y)
-            #SRs.append(SR)
-            self.out[batch] =y
-            #out.append(y)
-        '''
+
         rfft =torch.fft.fftn(x)
         amp = torch.abs(rfft) +torch.exp(torch.tensor(-10))
         log_amp = torch.log(amp)
@@ -257,9 +231,7 @@ class SRlayer_(nn.Module):
         y = self.output_conv(y)
         y = self.bn(y)
         y = self.Relu(y)
-        #print(self.out.type())
-        #print(y.shape)
-        #print(y.type())
+
         return y
 
 
@@ -463,8 +435,8 @@ class VisionTransformer(nn.Module):
 
         self.init_weights(weight_init)
 
-        #concate features
-        #self.concate = 
+        #concate features (ablation study)
+        
         #self.concate_conv = nn.Conv2d(2,3, kernel_size=1)
         #self.concate_bn  = nn.BatchNorm2d(3)
         #self.concate_relu = nn.ReLU()
@@ -583,18 +555,18 @@ class VisionTransformer(nn.Module):
         x_2 = self.firstrelu_2(x_2)
         x_2 = self.firstmaxpool_2(x_2)
         x_2 = self.encoder1_2(x_2)
-        #print(x_2.shape)
-        #exit()
+        
+        
         #x_2 = self.encoder2_2(x_2)
         #x_2 = self.encoder3_2(x_2)
-
+        #output decoder
         #out = self.decode1(torch.cat([x_1,x_2],dim=1))
         #out = self.decode2(out)
         out = self.decode3(torch.cat([x_1,x_2],dim=1))
-        #print(x_2.shape)
+        
         out = self.decode4(out)
         out = self.final_cat(out)
-        #print(out.shape)
+        
         return out
     
 
@@ -612,7 +584,7 @@ class VisionTransformer(nn.Module):
         for index, transformer_out in enumerate(features):
             VIT_OUT.append(self.out(transformer_out))
         for index, indices in enumerate(self.out_indices):
-            # 最后一个是最后层的输
+            #multi-level features
             out.append(self.Head["Head"+str(indices)](VIT_OUT[index]))
         
         return out
