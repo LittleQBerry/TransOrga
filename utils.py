@@ -139,22 +139,11 @@ class IoULoss(nn.Module):
 def get_compactness_cost(y_pred):
     
     #print(y_pred.shape)
-    
-    #y_pred = y_pred[..., 1]
-    #y_true = y_pred[..., 1]
-
-    #x = y_pred[:, 1:, :] - y_pred[:, :-1, :]  # horizontal and vertical directions
-    #y = y_pred[:, :, 1:] - y_pred[:, :, :-1]
     y_pred = y_pred[:,0,:,:]
-    x = y_pred[:,1:,:] - y_pred[:,:-1,:]
+    x = y_pred[:,1:,:] - y_pred[:,:-1,:] # horizontal and vertical directions
     y = y_pred[:,:,1:] - y_pred[:,:,:-1]
-    #x = y_pred
-    #print(x.shape)
-    #exit()
-    #print(x)
     delta_x = x[:, :, 1:] ** 2
     delta_y = y[:, 1:, :] ** 2
-    #print()
     delta_u = torch.abs(delta_x + delta_y)
 
     epsilon = 0.00000001  # where is a parameter to avoid square root is zero in practice.
@@ -165,6 +154,7 @@ def get_compactness_cost(y_pred):
     area = torch.sum(y_pred, dim=[1, 2]) +epsilon
     
     compactness_loss = torch.sum(length ** 2 / (area * 4 * 3.14))
+    #error case
     if compactness_loss >1000:
         print('length',length)
         print('y_pred',y_pred.shape)
@@ -172,12 +162,6 @@ def get_compactness_cost(y_pred):
         img_grid = [y_pred[0].reshape(1,512,512),y_pred[1].reshape(1,512,512),y_pred[2].reshape(1,512,512),y_pred[3]]
         save_image(img_grid,'test.png')
         exit()
-    #print(compactness_loss.shape)
-    #print(compactness_loss)
-    #print(length)
-    #print(area)
-    #exit()
-
     return compactness_loss
 
 
