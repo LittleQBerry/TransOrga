@@ -14,47 +14,14 @@ from dataset import Dataset
 from torch.utils.data import DataLoader
 from torchvision import utils as vutils
 from torch.optim.swa_utils import AveragedModel, SWALR
-#import torch.distibuted as dist
 
-#losses
 from utils import DiceLoss, get_compactness_cost, FocalLoss,FocalLoss_Binary
-#from focal_loss.focal_loss import FocalLoss
 
-def evaluate_accuracy_gpu(net, data_iter, device=None):
-    if isinstance(net, nn.Module):
-        net.eval()  # Set the model to evaluation mode
-        if not device:
-            device = next(iter(net.parameters())).device
-    # No. of correct predictions, no. of predictions
-    metric = d2l.Accumulator(2)
- 
-    with torch.no_grad():
-        cla_preds = []
-        cla_gt = []
-        for X, y, cla_labels in data_iter:
-            if isinstance(X, list):
-                # Required for BERT Fine-tuning (to be covered later)
-                X = [x.to(device) for x in X]
-            else:
-                X = X.to(device)
-            y = y.to(device).squeeze()
-            cla, output = net(X)
-            cla = torch.argmax(cla, 1)
-            cla_gt.append(torch.flatten(cla_labels).cpu().numpy())
-            cla_preds.append(torch.flatten(cla).cpu().numpy())
-            pred = output[-1]
-            metric.add(d2l.accuracy(pred, y), d2l.size(y))
-        cla_preds = np.concatenate(cla_preds)
-        cla_gt = np.concatenate(cla_gt)
-    return metric[0] / metric[1], accuracy_score(cla_gt,cla_preds)
-
-
-# 
 def train_epoch(net, train_iter, test_iter, loss,lossd, optimizer, start_epoch,num_epochs, scheduler, devices=d2l.try_all_gpus(), weight_path = None, data_dir = None):
     timer, num_batches = d2l.Timer(), len(train_iter)
 
     print(devices)
-
+    #log info
     loss_list = []
     cla_loss_list = []
     train_acc_list = []
@@ -83,6 +50,7 @@ def train_epoch(net, train_iter, test_iter, loss,lossd, optimizer, start_epoch,n
             gt = labels.long().cuda(non_blocking =True).squeeze()
             net.train()
             optimizer.zero_grad()
+            #mutli-level output
             result =net(X)
 
             input_gt = torch.nn.functional.one_hot(gt, 2).permute(0,3,1,2).type(dtype = torch.float32)
@@ -118,6 +86,7 @@ def train_epoch(net, train_iter, test_iter, loss,lossd, optimizer, start_epoch,n
             mask =mask.cuda(non_blocking =True)
             gt = mask.long().cuda(non_blocking =True).squeeze()
             with torch.no_grad():
+                #multi level results
                 output = net(img)
                 result = output[-1]
                 test_acc = d2l.accuracy(result, gt)
@@ -125,10 +94,7 @@ def train_epoch(net, train_iter, test_iter, loss,lossd, optimizer, start_epoch,n
                 #print(result.shape)
                 result = torch.argmax(result, dim=1)
                 result = result.reshape(result.shape[0],1,result.shape[1],result.shape[2]).type(dtype = torch.float32)
-
-                #trans RGB to L
                 gt_1 = img[0]
-                #print()
                 gt_1 = gt_1[0].reshape(1,gt_1.shape[1],gt_1.shape[2])
                 
                 if index%5 ==0:
@@ -195,9 +161,10 @@ transform_test = transforms.Compose([
     transforms.Resize((INPUT_SIZE,INPUT_SIZE)),  
 ])
 
+#dataset 
 batch_size = 4
 val_batch_size = 1
-data_path = '/organoid/Dataset/OriginalData'
+data_path = '/Dataset/OriginalData'
 train_set = Dataset(path=data_path, transform =transform_train, mode ='train')
 val_set =Dataset(path=data_path, transform=transform_test, mode='validation')
 
@@ -205,8 +172,7 @@ train_loader =DataLoader(train_set,batch_size =batch_size, shuffle =True)
 val_loader =DataLoader(val_set, batch_size =val_batch_size, shuffle =False)
 
 
-##
-
+## model initial
 model = VIT_seg.vit_base_patch16(img_size=INPUT_SIZE, weight_init="nlhb", seg_num_classes=2, num_classes=2, out_indices = [2, 5, 8, 11])
 
 
@@ -221,23 +187,20 @@ for k in ['head.weight', 'head.bias']:
 # interpolate position embedding
 pos_embed.interpolate_pos_embed(model, checkpoint_model)
 
-# load pre-trained model
+# distributed training
 model.load_state_dict(checkpoint_model, strict=False)
 model = nn.DataParallel(model.to('cuda:0'), device_ids=gpus, output_device=gpus[0])
 
 ##
 
-#load our model
-
+#load pre-trained model
 #model =torch.load("/organoid/our_FFT/log/checkpoints/net_121.pth", map_location='cpu').to('cuda:0')
 
 #print(model)
-# training loop 100 epochs
+# training setting
 start_epoch =0
 epochs_num = 400
-
 optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
-
 schedule =torch.optim.lr_scheduler.StepLR(optimizer, step_size = 10, gamma=0.1)
 
 lossd =DiceLoss(2)
