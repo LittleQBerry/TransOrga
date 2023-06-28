@@ -26,7 +26,7 @@ def vit_huge_patch14(**kwargs):
 
 
 # if __name__ == "__main__":
-#     # VIT-Large  设置了16个patch
+#     # VIT-Large 
 #     model = vit_base_patch16(img_size=224, weight_init="nlhb",  num_classes=4, out_indices = [2, 5, 8, 11])
 #     checkpoint_model = torch.load('../vit_base.pth')['model']
 #     state_dict = model.state_dict()
