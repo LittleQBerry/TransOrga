@@ -21,8 +21,6 @@ The dataset for model training and validation/testing is openly available here: 
 Please download the dataset and put them under /dataset
 # Preprocess
 
-If you want to utilize your data: Please first obtain the frequency-level images from **[SRNET.py](SRNet.py)**
-
 The frequency-level images of https://osf.io/xmes4/ is [SR_result](https://drive.google.com/file/d/1F0eUE39K6k09U5Ib7aHPvmsgOzLD-U5_/view?usp=sharing) and the edge images is [edge](https://drive.google.com/file/d/1DJslK0MAXTmoflxycCBbMOZKXjpCqMJc/view?usp=sharing).
 
 Please unzip these files and place the folders in the root directory, like 
@@ -33,9 +31,19 @@ Please unzip these files and place the folders in the root directory, like
 
 'TransOrga/edge_results'.
 
+If you want to utilize your data: Please first obtain the frequency-level images from **[SRNET.py](SRNet.py)**
+
 # Test
-run **[test.py](test.py)** to obtain the results.
-The pretrained model is [here](https://drive.google.com/file/d/1c6Ka99uWFOBYwN325Q9FjARW9d-iAeNQ/view?usp=sharing) 
+
+The pretrained model is [here](https://drive.google.com/file/d/1c6Ka99uWFOBYwN325Q9FjARW9d-iAeNQ/view?usp=sharing) .
+
+1. Download the pretrained model and put it in 'checkpoints/'.
+
+2. create 'log_results/' as the output folder.
+
+3. run **[test.py](test.py)** to obtain the results.
+
+
 
 # Train
 1. **[dataset.py](dataset.py)** contains how to load the data.
