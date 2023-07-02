@@ -40,12 +40,13 @@ transform_test = transforms.Compose([
 data_path = 'organoid/Dataset/OriginalData'
 val_set =Dataset(path=data_path, transform=transform_test, mode='test')
 val_loader =DataLoader(val_set, batch_size =1, shuffle =False)
-
-model =torch.load("/log/checkpoints/net_40.pth", map_location='cpu').to('cuda:0')
+#pretrained model
+model =torch.load("/checkpoints/net.pth", map_location='cpu').to('cuda:0')
 print(model)
 dices = 0
 ious = 0
 for index, (img, mask, name) in enumerate(val_loader):
+    #output dir
     vis_path = "/log_result/"
     model.eval()
     with torch.no_grad():
@@ -71,5 +72,5 @@ for index, (img, mask, name) in enumerate(val_loader):
         visualize_img_path = vis_path+str(name[0])
         vutils.save_image(img_visualize, visualize_img_path)
 
-print(ious / 14)
-print(dices /14)
+print(ious / len(val_loader))
+print(dices /len(val_loader))
