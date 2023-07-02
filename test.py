@@ -37,7 +37,7 @@ INPUT_SIZE =512
 transform_test = transforms.Compose([
     transforms.Resize((512,512)),
 ])
-data_path = 'organoid/Dataset/OriginalData'
+data_path = '/Dataset/OriginalData'
 val_set =Dataset(path=data_path, transform=transform_test, mode='test')
 val_loader =DataLoader(val_set, batch_size =1, shuffle =False)
 #pretrained model
