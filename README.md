@@ -16,18 +16,20 @@ d2l 0.17.6
 timm 0.6.12
 einops 0.6.0
 
-
+# Dataset
+The dataset for model training and validation/testing from the OrganoID publication is openly available here: https://osf.io/xmes4/
+Please download the dataset and put them under /dataset
 # Preprocess
 
-We can fisrt obtain the frequency level images from **[SRNET.py](SRNet.py)**
+Please fisrt obtain the frequency level images from **[SRNET.py](SRNet.py)**
 
 # Train
 1. **[dataset.py](dataset.py)** contains how to load the data.
 2. run **[train.py](train.py)**
 
 # Test
- run **[test.py](test.py)** to obtain the results and metrics.
-
+run **[test.py](test.py)** to obtain the results.
+The pretrained model is [here]() 
 
 # Result
 ![Compare](https://github.com/LittleQBerry/TransOrga/blob/main/image/compare_new.png)
