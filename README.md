@@ -31,7 +31,9 @@ Please unzip these files and place the folders in the root directory, like
 
 'TransOrga/edge_results'.
 
-If you want to utilize your data: Please first obtain the frequency-level images from **[SRNET.py](SRNet.py)**
+If you want to utilize your data: Please first obtain the frequency-level images using **[SRNET.py](SRNet.py)**
+
+(Please change the folder dirs as your owns.)
 
 # Test
 
