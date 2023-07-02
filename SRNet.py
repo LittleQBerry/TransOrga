@@ -58,18 +58,21 @@ class SRlayer_(nn.Module):
         return torch.cat(out,dim=0),torch.cat(SRs,dim=0)
 
 model  = SRlayer_(1)
-
-file_list =os.listdir("/organoid/Dataset/OriginalData/testing/images")
+#please replace the dirs whit your owns.
+file_list =os.listdir("/Dataset/OriginalData/testing/images")
 for files in file_list:
     name,_ = os.path.splitext(files)
-    img_name = "/organoid/Dataset/OriginalData/testing/images/"+ files
+    #original dir (change)
+    img_name = "/Dataset/OriginalData/testing/images/"+ files
     print(img_name)
-    #img = Image.open(img_name).convert("L")
-    img = cv2.imread(img_name,0)
-    #img = transforms.ToTensor()(img).unsqueeze(0)
-    #out,rs= model(img)
-    #torch.save(rs,'/organoid/our_FFT/SR_results/test/{}.pt'.format(name))
-    edges = cv2.Canny(img,100,255,apertureSize=3)
-    cv2.imwrite('/organoid/our_FFT/edge_result/testing/{}.png'.format(name),edges)
-    #print(rs.type())
-    #print(rs.shape)
+    img = Image.open(img_name).convert("L")
+    #img = cv2.imread(img_name,0)
+    img = transforms.ToTensor()(img).unsqueeze(0)
+    out,rs= model(img)
+    #SR output dir (change)
+    torch.save(rs,'/SR_results/testing/{}.pt'.format(name))
+    
+    #edge dir (change)
+    #edges = cv2.Canny(img,100,255,apertureSize=3)
+    #cv2.imwrite('/edge_result/testing/{}.png'.format(name),edges)
+    
