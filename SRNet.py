@@ -65,13 +65,16 @@ for files in file_list:
     #original dir (change)
     img_name = "/Dataset/OriginalData/testing/images/"+ files
     print(img_name)
+    #for SR
     img = Image.open(img_name).convert("L")
-    #img = cv2.imread(img_name,0)
+    
     img = transforms.ToTensor()(img).unsqueeze(0)
+    
     out,rs= model(img)
     #SR output dir (change)
     torch.save(rs,'/SR_results/testing/{}.pt'.format(name))
-    
+    #for edge
+    #img = cv2.imread(img_name,0)
     #edge dir (change)
     #edges = cv2.Canny(img,100,255,apertureSize=3)
     #cv2.imwrite('/edge_result/testing/{}.png'.format(name),edges)
