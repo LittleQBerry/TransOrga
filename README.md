@@ -17,12 +17,12 @@ timm 0.6.12
 einops 0.6.0
 
 # Dataset
-The dataset for model training and validation/testing from the OrganoID publication is openly available here: https://osf.io/xmes4/
+The dataset for model training and validation/testing is openly available here: https://osf.io/xmes4/
 Please download the dataset and put them under /dataset
 # Preprocess
 
-Please fisrt obtain the frequency level images from **[SRNET.py](SRNet.py)**
-
+If you want to utilize your own data: Please fisrt obtain the frequency level images from **[SRNET.py](SRNet.py)**
+The preprocess of https://osf.io/xmes4/ is [SR_result]()
 # Train
 1. **[dataset.py](dataset.py)** contains how to load the data.
 2. run **[train.py](train.py)**
