@@ -25,7 +25,7 @@ The frequency-level images of https://osf.io/xmes4/ is [SR_result](https://drive
 
 Please unzip these files and place the folders in the root directory, like 
 
-'TransOrage/Dataset',
+'TransOrga/Dataset',
 
 'TransOrga/SR_results', 
 
