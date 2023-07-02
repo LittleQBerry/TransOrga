@@ -47,7 +47,7 @@ dices = 0
 ious = 0
 for index, (img, mask, name) in enumerate(val_loader):
     #output dir
-    vis_path = "/log_result/"
+    vis_path = "/log_results/"
     model.eval()
     with torch.no_grad():
         #input
