@@ -18,18 +18,21 @@ class Dataset(torch.utils.data.Dataset):
             self.img_path =self.img_path +"/training/images/"
             self.mask_path = self.mask_path +"/training/segmentations/"
             self.edge_path ='/edge_result/training/'
+            self.sr_path = '/SR_results/training/'
             train_file = os.listdir(self.img_path)
             files=train_file
         elif self.mode == 'validation':
             self.img_path =self.img_path +"/validation/images/"
             self.mask_path = self.mask_path +"/validation/segmentations/"
             self.edge_path = '/edge_result/validation/'
+            self.sr_path ='/SR_results/validation/'
             valid_file = os.listdir(self.img_path)
             files =valid_file
         elif self.mode == 'test':
             self.img_path =self.img_path +"/testing/images/"
             self.mask_path = self.mask_path +"/testing/segmentations/"
             self.edge_path = '/edge_result/testing/'
+            self.sr_path = '/SR_results/testing/'
             test_file = os.listdir(self.img_path)
             files=test_file
         self.files = files
@@ -44,7 +47,7 @@ class Dataset(torch.utils.data.Dataset):
             mask = Image.open(self.mask_path+self.files[index].strip()).convert('L')
             edge = Image.open(self.edge_path+self.files[index].strip()).convert('L')
             seed = torch.random.seed()
-            sr =torch.load("/SR_results/training/{}.pt".format(name))
+            sr =torch.load("{}/{}.pt".format(self.sr_path,name))
             sr =sr[0]          
             torch.random.manual_seed(seed)
             img = self.transform(img)
@@ -71,7 +74,7 @@ class Dataset(torch.utils.data.Dataset):
             mask = Image.open(self.mask_path+self.files[index].strip()).convert('L')
             edge = Image.open(self.edge_path+self.files[index].strip()).convert('L')
             seed = torch.random.seed()
-            sr =torch.load("/SR_results/validation/{}.pt".format(name))
+            sr =torch.load("{}/{}.pt".format(self.sr_path,name))
             sr =sr[0]
             
             torch.random.manual_seed(seed)
@@ -95,7 +98,7 @@ class Dataset(torch.utils.data.Dataset):
             mask = Image.open(self.mask_path+self.files[index].strip()).convert('L')
             edge = Image.open(self.edge_path+self.files[index].strip()).convert('L')
             seed = torch.random.seed()
-            sr =torch.load("/SR_results/test/{}.pt".format(name))
+            sr =torch.load("{}/{}.pt".format(self.sr_path,name))
             sr =sr[0]
             
             torch.random.manual_seed(seed)
