@@ -48,7 +48,7 @@ Our pretrained model is [here](https://drive.google.com/file/d/1c6Ka99uWFOBYwN32
 
 
 # Train
-You can download the official pretrained vit-based model [here](https://drive.google.com/file/d/11UcqfiWLkDjOlUf2bQ17KKusi93lPXhn/view?usp=sharing).
+You can download the official pretrained vit-base model [here](https://drive.google.com/file/d/11UcqfiWLkDjOlUf2bQ17KKusi93lPXhn/view?usp=sharing).
 
 1. **[dataset.py](dataset.py)** contains how to load the data.
 2. run **[train.py](train.py)**
