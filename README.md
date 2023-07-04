@@ -37,7 +37,7 @@ If you want to utilize your data: Please first obtain the frequency-level images
 
 # Test
 
-The pretrained model is [here](https://drive.google.com/file/d/1c6Ka99uWFOBYwN325Q9FjARW9d-iAeNQ/view?usp=sharing) .
+Our pretrained model is [here](https://drive.google.com/file/d/1c6Ka99uWFOBYwN325Q9FjARW9d-iAeNQ/view?usp=sharing) .
 
 1. Download the pretrained model and put it in 'checkpoints/'.
 
@@ -48,6 +48,8 @@ The pretrained model is [here](https://drive.google.com/file/d/1c6Ka99uWFOBYwN32
 
 
 # Train
+You can download the official pretrained vit-based model [here](https://drive.google.com/file/d/11UcqfiWLkDjOlUf2bQ17KKusi93lPXhn/view?usp=sharing).
+
 1. **[dataset.py](dataset.py)** contains how to load the data.
 2. run **[train.py](train.py)**
 
