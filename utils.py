@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from medpy import metric
+#from medpy import metric
 from scipy.ndimage import zoom
 import torch.nn as nn
 from torchvision.utils import save_image
