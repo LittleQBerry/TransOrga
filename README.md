@@ -65,7 +65,7 @@ ACC organoid
 | SegNet | 0.798 | 0.664 |0.579 |0.803 |0.630 |
 | A-Unet | 0.884 | 0.791 |0.671 |0.952 |0.783 |
 | OrganoID | 0.848 | 0.736 |0.622 |0.866|0.716|
-| Ours | 0.913 | 0.840 |0.791|0.903|0.837 |
+| Ours | 0.913 | 0.840 |0.791|0.903|0.843 |
 
 Colon organoid
 |   Model  | Dice↑ | mIoU↑ | Precision↑ | Recall↑ | F1-score↑ |
