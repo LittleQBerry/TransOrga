@@ -286,38 +286,64 @@ class PUPHead(nn.Module):
         super(PUPHead, self).__init__()
         
         self.UP_stage_1 = nn.Sequential(
-            nn.Conv2d(embed_dim, 256, 3, padding=1),
-            nn.BatchNorm2d(256),
+            nn.Conv2d(embed_dim, 384, 1, padding=0),
+            nn.BatchNorm2d(384),
             nn.ReLU(),
-            nn.Upsample(scale_factor=2, mode="bilinear", align_corners=True)
         )        
         self.UP_stage_2 = nn.Sequential(
-            nn.Conv2d(256, 256, 3, padding=1),
-            nn.BatchNorm2d(256),
+            nn.Conv2d(384, 384, 3, padding=1),
+            nn.BatchNorm2d(384),
             nn.ReLU(),
-            nn.Upsample(scale_factor=2, mode="bilinear", align_corners=True)
         )        
         self.UP_stage_3= nn.Sequential(
-            nn.Conv2d(256, 256, 3, padding=1),
-            nn.BatchNorm2d(256),
-            nn.ReLU(),
-            nn.Upsample(scale_factor=2, mode="bilinear", align_corners=True)
+            nn.Conv2d(384, 192, 3, padding=1),
+            nn.BatchNorm2d(192),
+            nn.ReLU()
         )        
         self.UP_stage_4= nn.Sequential(
-            nn.Conv2d(256, 256, 3, padding=1),
-            nn.BatchNorm2d(256),
-            nn.ReLU(),
-            nn.Upsample(scale_factor=2, mode="bilinear", align_corners=True)
+            nn.Upsample(scale_factor=4, mode="bilinear", align_corners=True)
         )
-    
-        self.cls_seg = nn.Conv2d(256, num_classes, 3, padding=1)
+        self.UP_stage_5= nn.Sequential(
+            nn.Conv2d(192, 2, 3, padding=1),
+            nn.BatchNorm2d(2),
+            nn.ReLU()
+        )
+        self.UP_stage_6= nn.Sequential(
+            nn.Upsample(scale_factor=4, mode="bilinear", align_corners=True)
+        )
+        # self.cls_seg = nn.Conv2d(256, num_classes, 3, padding=1)
  
     def forward(self, x):
         x = self.UP_stage_1(x)
         x = self.UP_stage_2(x)
-        x = self.UP_stage_3(x)
-        x = self.UP_stage_4(x)
-        x = self.cls_seg(x)
+        y = self.UP_stage_3(x)
+        x = self.UP_stage_4(y)
+        x = self.UP_stage_5(x)
+        x = self.UP_stage_6(x)
+        return y,x
+
+
+class PUPHeadCat(nn.Module):
+    def __init__(self, num_classes, embed_dim):
+        super(PUPHeadCat, self).__init__()
+        self.Upsample1 = nn.Upsample(scale_factor=4, mode="bilinear", align_corners=True)
+        self.Upsample2 = nn.Upsample(scale_factor=4, mode="bilinear", align_corners=True)
+        self.Upsample3 = nn.Upsample(scale_factor=4, mode="bilinear", align_corners=True)
+        self.Upsample4 = nn.Upsample(scale_factor=4, mode="bilinear", align_corners=True)
+        self.CatConv = nn.Sequential(
+            nn.Conv2d(768, 2, 3, padding=1),
+            nn.BatchNorm2d(2),
+            nn.ReLU(),
+            nn.Upsample(scale_factor=4, mode="bilinear", align_corners=True)
+        )
+    def forward(self, x):
+        x0 = self.Upsample1(x[-1])
+        x1 = self.Upsample2(x[-1]+x[-2])
+        x2 = self.Upsample3(x[-2]+x[-3])
+        x3 = self.Upsample3(x[-3]+x[-4])
+
+        x = torch.concatenate([x3,x2,x1,x0],dim=1)
+        x = self.CatConv(x)
         return x
 
 import torchvision.models as models
@@ -476,6 +502,7 @@ class VisionTransformer(nn.Module):
         #
         
         self.Head = nn.ModuleDict()
+        self.PubCat = PUPHeadCat(seg_num_classes, embed_dim)
  
         for index, indices in enumerate(self.out_indices):
             self.Head["Head"+str(indices)] = PUPHead(seg_num_classes, embed_dim)
@@ -574,19 +601,25 @@ class VisionTransformer(nn.Module):
 
         #get SR
         #print(x.shape)
-        x =self.cat_features(x)
+        # x =self.cat_features(x)
         #res cat
         #x_input = self.cat_features_2(x)
         #vit
         x, features = self.forward_features(x)
         VIT_OUT = []
         out = []
+        mid_features = []
         for index, transformer_out in enumerate(features):
             VIT_OUT.append(self.out(transformer_out))
         for index, indices in enumerate(self.out_indices):
             #multi-level features
-            out.append(self.Head["Head"+str(indices)](VIT_OUT[index]))
+            out_head = self.Head["Head"+str(indices)](VIT_OUT[index])
+            mid_features.append(out_head[0])
+            if index<3:
+                out.append(out_head[1])
         
+        mid_out = self.PubCat(mid_features)
+        out.append(mid_out)
         return out
 
 
