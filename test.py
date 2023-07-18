@@ -72,5 +72,6 @@ for index, (img, mask, name) in enumerate(val_loader):
         visualize_img_path = vis_path+str(name[0])
         vutils.save_image(img_visualize, visualize_img_path)
 
+#this is iou not miou
 print(ious / len(val_loader))
 print(dices /len(val_loader))
